@@ -2,14 +2,27 @@
   "version": 2,
   "builds": [
     {
-      "src": "feedbackSystem/wsgi.py",
+      "src": "manage.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "/staticfiles/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "feedbackSystem/wsgi.py"
+      "dest": "manage.py"
     }
-  ]
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "your_project.settings",
+    "SECRET_KEY": "@vercel/secure-key"
+  },
+  "buildCommand": "python manage.py collectstatic --noinput",
+  "postinstall": "python manage.py migrate && python manage.py collectstatic --noinput"
 }
