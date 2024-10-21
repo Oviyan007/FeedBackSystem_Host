@@ -1,0 +1,15 @@
+{% extends 'home/index.html' %}
+<!-- {% include 'home/header.html' %}  -->
+{% block body %}
+{% include 'home/navbar.html' %}
+
+<div class="container-fluid">
+    <div class="col-md-offset-4 col-md-4 " style="margin-top: 100px;">
+    <h2>You have been Logged out </h2>
+    <hr>
+Login Again ?<a href="{% url 'Login'  %}">Login</a>
+</div>
+
+</div>
+{% include 'home/footer.html' %} 
+{% endblock %}

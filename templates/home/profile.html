@@ -1,0 +1,41 @@
+{% extends 'home/layout.html' %}
+{% include 'home/header.html' %} 
+
+{% block body  %}
+{% include 'home/navbar.html' %}
+<div class="container" style="margin-top: 100px;">
+    
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="text-uppercase page-header text-primary">Profile Page </h1>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-center align-items-center">
+        <div class="col-md-6 mt-5">
+            <table class="table">
+                <tr>
+                    
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Role</th>
+                </tr>
+                <tr>
+                <td>{{user.name}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.role}}</td></tr>
+            </table>
+        </div>
+    </div>
+        
+          
+
+            
+
+            
+           
+   
+</div>
+
+    
+{% include 'home/footer.html' %} 
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'home/layout.html' %}
+{% include 'home/header.html' %} 
+
+{% block body  %}
+<style>
+   
+  *{
+    list-style-type: none;
+  }
+
+</style>
+{% include 'home/navbar.html' %}
+<div class="container " style="margin-top: 100px;">
+    <div class="row">
+        <div class="col-md-12 ">
+            <h2 class="text-primary page-header text-center pb-4">FeedBack Form</h2>
+        </div>
+    </div>
+    <div class="row">
+            {% if user.role == 'STUDENT'%}    
+
+                <div class="col-md-6 d-flex justify-content-center">    
+                    <form method="POST" action="{% url 'FeedBack' %}">
+                        {% csrf_token %}
+                            {% for question in questions %}
+                            <h6>{{ question.questions }}</h6>
+                            <ul>
+                                {% for answer in answers %}
+                                    <li>
+                                        <input type="radio" value="{{ answer.answer_value }}" name="option{{ question.id }}">{{ answer.answer }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endfor %}
+                        
+                           
+                                <input type="submit" class='btn btn-primary ' value="submit">
+                            
+                            
+                        </form>    
+                </div>
+            
+                {% else %}
+                        <h2>you're not eligible</h2>
+                {% endif %}
+        
+            </div>
+    
+  
+           
+  
+</div>
+
+    
+
+{% endblock %}

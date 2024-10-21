@@ -1,0 +1,72 @@
+*{
+    margin: 0px;
+    padding: 0px;  
+    
+    
+}
+.navbar-custom{
+    color:white;
+    font-size:20px;
+}
+.nav-link:hover{
+    color:orange;
+}
+
+
+h1{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+.well{
+    box-shadow: 2px 2px 15px 0px black;
+    padding: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+.well-login{
+    padding: 10px;
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+
+
+/* code for footer  */
+
+
+.footer {
+    background-color: #198754;
+    position: fixed;
+}
+
+.footer-content h2 {
+    color: #fff;
+}
+
+.footer-content h5,
+.footer-content p,
+.footer-links a {
+    color: #fff;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.footer hr {
+    background-color: #fff;
+}
+/* code for footer  end */
+.carousel-item img {
+    object-fit: cover;
+    object-position: top;
+    height: 60vh;
+    overflow: hidden;
+  }
+  
