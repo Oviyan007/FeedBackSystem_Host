@@ -1,28 +1,21 @@
 {
-  "version": 2,
   "builds": [
     {
-      "src": "manage.py",
-      "use": "@vercel/python"
+      "src": "feed-back-system/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     }
   ],
   "routes": [
-    {
-      "handle": "filesystem"
-    },
     {
       "src": "/static/(.*)",
       "dest": "/staticfiles/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "manage.py"
+      "dest": "feed-back-system/wsgi.py"
     }
-  ],
-  "env": {
-    "DJANGO_SETTINGS_MODULE": "feedbackSystem.settings",
-    "SECRET_KEY": "@vercel/secure-key"
-  },
-  "buildCommand": "python manage.py collectstatic --noinput",
-  "postinstall": "python manage.py migrate && python manage.py collectstatic --noinput"
+  ]
 }
