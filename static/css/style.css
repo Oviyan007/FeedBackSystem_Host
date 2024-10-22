@@ -41,8 +41,7 @@ h1{
 
 
 .footer {
-    background-color: #198754;
-    position: fixed;
+    width: 100%;
 }
 
 .footer-content h2 {

@@ -24,7 +24,7 @@ class User(AbstractUser):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name=models.CharField(max_length=50,null=False,blank=False)
-    email = models.EmailField(unique=True,null=False,blank=False)
+    email = models.EmailField(unique=True, max_length=191, null=False, blank=False)
     password = models.CharField(max_length=50)
     designation = models.CharField(max_length=50, choices=DESIGNATION_CHOICES, default='STUDENT',null=False,blank=False)
 
