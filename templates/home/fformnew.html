@@ -10,7 +10,7 @@
     {% include 'home/navbar.html' %}
     {% if user.role == 'STUDENT'%}
     <!-- code for dropbox -->
-        <div class="container">
+        <div class="container ">
             <div class="row mt-4">
                 <form method="post" action="" id="batchDepartmentForm">
                     {% csrf_token %}
@@ -41,14 +41,14 @@
                     {% if user.role == 'STUDENT'%}
                 
                             <!-- code for question 1 -->
-                                <div class="container">
+                                <div class="container mt-4" >
                                     <div class="row">
                                         <div class="form-check" style="text-align: left;">
-                                            <p class="font-weight-bold text-center">A . Time Management</p>
+                                            <p class="font-weight-bold text-center"><strong>  A . Time Management</strong></p>
                                                 <label class="from-check-label font-weight-bold">Punctuality of the Faculty to the class</label>
-                                                <br>
+                                                
                                                 {% for sub in subjects %}
-                                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                                     {% for choice in form.options.field.widget.choices %}
                                                                     <div class="form-check d-inline">
                                                                         <!-- Unique name for this question -->
@@ -58,7 +58,7 @@
                                                                         </label>
                                                                     </div>
                                                                     {% endfor %}
-                                                                    <br>
+                                                                    
                                                                     <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
                                                                     <input type="hidden" name="Qno" value="{{ forloop.counter }}">
                                                                     <input type="hidden" name="year" value="{{ request.POST.year }}">
@@ -66,14 +66,15 @@
                                                                 {% endfor %}
                                             </div>
                                     </div>
+                                    <hr>
                                         <!-- code for question 1 end -->
                                         <!-- code for question 2 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     <label class="from-check-label font-weight-bold">Regularity of the Faculty in taking classes</label>
-                                                    <br>
+                                                    
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -87,14 +88,14 @@
                                                 {% endfor %}
                                                 </div>
                                         </div>
+                                        <hr>
                                             <!-- code for question 2 end -->
                                         <!-- code for question 3 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     <label class="from-check-label font-weight-bold">Complete syllabus of the course in time for AT/Model Test</label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -104,18 +105,18 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 3 end -->
                                         <!-- code for question 4 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     <label class="from-check-label font-weight-bold">Regularity of the Faculty in taking attendance in classes</label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -125,19 +126,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
                                             <!-- code for question 4 end -->
-                                        <!-- code for question 5 -->
+                                            <!-- code for question 5 -->
+                                            <hr>
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     <p class="font-weight-bold text-center">B. Planning and Preparation of Subject Matters</p>
                                                     <label class="from-check-label font-weight-bold">Focus on Syllabi </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -147,19 +148,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 5 end -->
                                         <!-- code for question 6 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Communication Skill  </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -169,19 +170,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 6 end -->
                                         <!-- code for question 7 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Teaching the subject matter   </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -191,19 +192,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 7 end -->
                                         <!-- code for question 8 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Skill of Linking subject to other subject  </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -213,19 +214,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 8 end -->
                                         <!-- code for question 9 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Assignment Strategies Followed  </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -235,19 +236,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 9 end -->
                                         <!-- code for question 10 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     <p class="font-weight-bold text-center">C . Methodology of Teaching</p>
                                                     <label class="from-check-label font-weight-bold">Use of Teaching aids (OHP, Black Board, PPT, Models / Simulation) </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -257,19 +258,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 10 end -->
                                         <!-- code for question 11 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Uses of involving Teaching Methods  </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -279,19 +280,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 11 end -->
                                         <!-- code for question 12 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Clarify students doubt in the class  </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -301,19 +302,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 12 end -->
                                         <!-- code for question 13 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     <p class="font-weight-bold text-center">D . Faculty Attitude</p>
                                                     <label class="from-check-label font-weight-bold">Helping approach towards varied responsibility to the institution  </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -323,19 +324,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 13 end -->
                                         <!-- code for question 14 -->
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Posture and Gesture   </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -345,19 +346,19 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
                                             <!-- code for question 14 end -->
-                                        <!-- code for question 15 -->
+                                            <!-- code for question 15 -->
+                                            <hr>
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Towards paper Evaluation and personal remark making  </label>
-                                                    <br>
                                                     {% for sub in subjects %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -367,10 +368,11 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 15 end -->
                                             <!-- lab question start -->
                                         <!-- code for question lab16 -->
@@ -381,9 +383,8 @@
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Do you have enough tools and equipments to carry out Lab practices individually?  </label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -393,10 +394,11 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 16 end -->
                                         <!-- code for question lab17 -->
                                     
@@ -404,9 +406,8 @@
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Is the Lab clean, neat and spacious ? </label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -416,10 +417,11 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question 17 end -->
                                         <!-- code for question lab18 -->
                                         
@@ -427,9 +429,8 @@
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Are there enough safety precautions available in the Lab?   </label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -439,20 +440,20 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
                                             <!-- code for question 18 end -->
-                                        <!-- code for question lab19 -->
+                                            <!-- code for question lab19 -->
+                                            <hr>
                                         
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">How do you feel about the timings allotted to carry out each exercises ?   </label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -462,20 +463,20 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
                                             <!-- code for question lab19 end -->
                                             <!-- code for question lab20 -->
+                                            <hr>
                                         
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">How do you feel about the timings given to complete the lab records?    </label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -485,20 +486,20 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question lab20 end -->
-                                        <!-- code for question lab21 -->
+                                            <!-- code for question lab21 -->
                                         
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Does the Lab-in charge and Lab instructors guide you to carry out exercises smoothly ?</label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -508,20 +509,20 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question lab21 end -->
-                                        <!-- code for question lab22 -->
+                                            <!-- code for question lab22 -->
                                         
                                         <div class="row">
                                             <div class="form-check" style="text-align: left;">
-                                                    
+                                                
                                                     <label class="from-check-label font-weight-bold">Is your Lab-in charge open-minded and Unbiased ?</label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -531,10 +532,11 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question lab22 end -->
                                         <!-- code for question lab23 -->
                                         
@@ -542,9 +544,8 @@
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Are the numbers of Lab instructors enough to help you in doing the work ?</label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -554,10 +555,11 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question lab23 end -->
                                         <!-- code for question lab24 -->
                                         
@@ -565,9 +567,8 @@
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Are you free to express your inabilities, inconveniences and needs if any in the workshop ?</label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -577,10 +578,11 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
+                                                    
+                                                    {% endfor %}
                                                 </div>
-                                        </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question lab24 end -->
                                         <!-- code for question lab25 -->
                                         
@@ -588,9 +590,8 @@
                                             <div class="form-check" style="text-align: left;">
                                                     
                                                     <label class="from-check-label font-weight-bold">Is the entire Lab session, memorable and useful?</label>
-                                                    <br>
                                                     {% for sub in labs %}
-                                                    <p>{{ sub.sub_code }}/{{ sub.sub_name }}</p>
+                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% for choice in form.options.field.widget.choices %}
                                                     <div class="form-check d-inline">
                                                         <!-- Unique name for this question -->
@@ -600,10 +601,11 @@
                                                         </label>
                                                     </div>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
-                                        </div>
-                                        </div>
+                                                    
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <hr>
                                             <!-- code for question lab25 end -->
                                             <!-- lab questionended -->
                                         

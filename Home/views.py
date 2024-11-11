@@ -56,11 +56,17 @@ def Register(request):
     return render(request, 'home/register.html', {'form': form})
        
 def Loginview(request):
-    form = RegistrationForm()
-    username = form.cleaned_data.get('username')
-    password = form.cleaned_data.get('password1')
-    user = authenticate(request, username=username, password=password)
-    login(request, user)
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('Home')  # Redirect to homepage or desired page after login
+        else:
+            messages.error(request, 'Invalid username or password')  
+
     return render(request, 'home/login.html',)
 
 def Logoutview(request):
