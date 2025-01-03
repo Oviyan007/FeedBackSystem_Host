@@ -87,26 +87,14 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 DATABASES = {
-
-'default' :{
-
-        'ENGINE':'django.db.backends.mysql',
-
-        'NAME':'feedbacksystem',
-
-        'USER':'root',
-
-        'PASSWORD':'',
-
-        'HOST':'127.0.0.1',
-
-        'PORT':'3306',
-        'OPTIONS': {
-            'charset': 'utf8',
-        },
-
-}
-
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': 'feedbacksystem',
+       'USER': 'postgres',
+       'PASSWORD': 'admin',
+       'HOST': 'localhost',
+       'PORT': '5432',
+   }
 }
 
 

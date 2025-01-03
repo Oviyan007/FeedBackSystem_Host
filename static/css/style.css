@@ -69,3 +69,32 @@ h1{
     overflow: hidden;
   }
   
+  /* style for moon button  */
+  :root {
+    /* Light theme colors */
+    --button-bg-light: #f0f0f0;
+    --button-color-light: #333;
+
+    /* Dark theme colors */
+    --button-bg-dark: #333;
+    --button-color-dark: #f0f0f0;
+}
+
+body.light-mode {
+    --button-bg: var(--button-bg-light);
+    --button-color: var(--button-color-light);
+}
+
+body.dark-mode {
+    --button-bg: var(--button-bg-dark);
+    --button-color: var(--button-color-dark);
+}
+
+#themeToggleButton {
+    background-color: var(--button-bg);
+    color: var(--button-color);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}

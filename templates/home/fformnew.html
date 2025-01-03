@@ -28,6 +28,19 @@
                             <option>{{ ans.department }}</option>
                         {% endfor %}
                     </select>
+                    <select name="semester" id="semester">
+                        <option value="">Select the Semester</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                         
+                    </select>
+                    <!-- <button type="submit" class="btn btn-primary">Next</button> -->
                     <input type="submit" value="Get " id="BatchButton" class="btn btn-primary" >
                     <!-- <a href="{{ request.get_full_path }}" class="btn btn-primary">Refresh</a> -->
                 </form>
@@ -623,6 +636,7 @@
 <h1>You are not able to answer </h1>
 {% endif %}     
             
+                            </div>
                             <script>  // JavaScript to toggle content visibility based on batch and department selection
                                 window.addEventListener('load', function () {
                                 var batchSelect = document.getElementById('batchSelect');
@@ -646,7 +660,6 @@
                                         
                                         
                                         </script>
-                            </div>
                     
                           
 {% endblock %}

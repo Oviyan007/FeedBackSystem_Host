@@ -46,11 +46,12 @@ class Subject_detail(models.Model):
     sub_code=models.CharField(max_length=50,null=False,blank=False)
     sub_name=models.CharField(max_length=50,null=False,blank=False)
     sub_type=models.CharField(max_length=50, choices=SUBJECT_CHOICES, default='SUBJECT',null=False,blank=False)
+    orensemester = models.IntegerField(default=1)
     department=models.CharField(max_length=50,default='',null=False,blank=False)
     
 
     def __str__(self):
-        return f" {self.Batch}-------{self.sub_code}---{self.sub_name}"
+        return f" {self.Batch}-------{self.sub_code}---{self.sub_name}----{self.orensemester} semster"
     
     #staff table 
 class Staff(models.Model):
@@ -63,6 +64,7 @@ class Staff(models.Model):
         return f"{self.name} ({self.staff_id})"
     
 class FeedbackRes(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True) #newly added
     department = models.CharField(max_length=50)
     Response=models.IntegerField(null=False)
     Qno=models.IntegerField(null=True)

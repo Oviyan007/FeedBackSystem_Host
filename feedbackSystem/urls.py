@@ -16,5 +16,6 @@ urlpatterns = [
     # path("GetReview",views.Review_feedback,name='GetReview'),
     #report generating 
     path('Report',views.feedback_report_view,name='Report'),
+    # path('test',views.test,name='test')
    
 ]

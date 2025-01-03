@@ -1,12 +1,14 @@
 {% include 'home/header.html' %}
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Django App</title>
+    
+    <title>FeedBack System</title>
 </head>
-<body>
+<body >
     {%block body %}
 
 
@@ -18,5 +20,18 @@
     $(document).ready(function(){
         $(".alert").hide(4000);
     });
+    const button = document.getElementById('themeToggleButton');
+
+        // Add a click event listener to the button
+        button.addEventListener('click', function() {
+            // Get the current theme
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+            
+            // Toggle between 'dark' and 'light'
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            // Set the new theme
+            document.documentElement.setAttribute('data-bs-theme', newTheme);
+        });
 </script>
  
