@@ -194,9 +194,15 @@ def feedback_report_view(request):
     )
     #code for faculty name...
     # For each subject, find the related staff using the ManyToMany relationship
+    # for feedback in subject_feedback:
+    #     subject = Subject_detail.objects.get(sub_code=feedback['subject_detail__sub_code'])
+    #     feedback['staff_names'] = ', '.join([staff.name for staff in subject.staff_handling.all()])
     for feedback in subject_feedback:
-        subject = Subject_detail.objects.get(sub_code=feedback['subject_detail__sub_code'])
-        feedback['staff_names'] = ', '.join([staff.name for staff in subject.staff_handling.all()])
+        subject = Subject_detail.objects.filter(sub_code=feedback['subject_detail__sub_code']).first()
+        if subject:
+            feedback['staff_names'] = ', '.join([staff.name for staff in subject.staff_handling.all()])
+        else:
+            feedback['staff_names'] = 'N/A'
 
     context = {
         'subject_feedback': subject_feedback,
