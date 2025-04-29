@@ -18,37 +18,65 @@ from django.db.models import Count,Q,Avg
 
 def Home(request):
     return render(request,'home/index.html')
-# def Login(request):
-#     return render(request,'home/login.html')
+
+# def Register(request):
+#     if request.method == 'POST':
+#         form = RegistrationForm(request.POST)
+#         if form.is_valid():
+#             # Create the user
+           
+#             user = form.save()
+
+#             # Additional fields specific to UserProfile
+#             name = form.cleaned_data.get('name')
+
+#             # Check if 'name' is not empty before creating the UserProfile
+#             if name:
+#                 # Create UserProfile instance
+#                 user_profile = UserProfile(user=user, name=name, designation=form.cleaned_data['designation'])
+#                 user_profile.save()
+#             else:
+#                 # Handle the case where 'name' is empty (provide appropriate error handling or redirect)
+#                 print("Error: 'name' cannot be empty")
+
+#             messages.success(request,"Account has been created")
+
+#             # Log the user in
+        
+
+#             # Redirect to a success page or home page
+#             return redirect('Login')
+#         else:
+#             # Form is not valid, handle errors or log them for debugging
+#             print(form.errors)
+#     else:
+#         form = RegistrationForm()
+
+#     return render(request, 'home/register.html', {'form': form})
 def Register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            # Create the user
-           
-            user = form.save()
+            # Create User object but don't save to database yet
+            user = form.save(commit=False)
 
-            # Additional fields specific to UserProfile
-            name = form.cleaned_data.get('name')
+            # Set the role from form designation
+            user.role = form.cleaned_data['designation']
+            user.email = form.cleaned_data['email']
+            user.save()
 
-            # Check if 'name' is not empty before creating the UserProfile
-            if name:
-                # Create UserProfile instance
-                user_profile = UserProfile(user=user, name=name, designation=form.cleaned_data['designation'])
-                user_profile.save()
-            else:
-                # Handle the case where 'name' is empty (provide appropriate error handling or redirect)
-                print("Error: 'name' cannot be empty")
+            # Create associated UserProfile
+            name = form.cleaned_data['name']
+            UserProfile.objects.create(
+                user=user,
+                name=name,
+                email=user.email,
+                designation=user.role
+            )
 
-            messages.success(request,"Account has been created")
-
-            # Log the user in
-        
-
-            # Redirect to a success page or home page
+            messages.success(request, "Account has been created successfully.")
             return redirect('Login')
         else:
-            # Form is not valid, handle errors or log them for debugging
             print(form.errors)
     else:
         form = RegistrationForm()
@@ -71,7 +99,8 @@ def Loginview(request):
 
 def Logoutview(request):
     logout(request)
-    return redirect('Home')     
+    # request.session.pop('has_submitted', None)  # Remove the session variable
+    return redirect('Home')
 
 
 
@@ -130,6 +159,7 @@ def feedback_view(request):
                     batch_year=selected_batch_year
                 )
                 feedback.save()
+        request.session['has_submitted'] = True
 
     form = OptionForm()
 

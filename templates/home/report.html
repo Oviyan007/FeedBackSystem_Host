@@ -88,6 +88,26 @@
         tr:hover {
             background-color: #f1f1f1;
         }
+         /* Print-specific styles */
+    @media print {
+        /* Hide the select box and the filter button during printing */
+        #batchDepartmentForm, 
+        #BatchButton,
+        #downloadPDF {
+            display: none;
+        }
+    @media print {
+    nav.navbar {
+      display: none !important;
+    }
+  }
+        /* Ensure the table is properly displayed during printing */
+        table {
+            width: 100%;
+            page-break-inside: avoid;
+        }
+        
+    }
     </style>
 </head>
 <body>
@@ -232,10 +252,28 @@
         });
          
     
-        document.getElementById('downloadPDF').
-            addEventListener('click', function () {
-                window.print();
-            });
+        document.getElementById('downloadPDF').addEventListener('click', function () {
+    // Hide certain elements for printing
+    document.getElementById('downloadPDF').style.display = 'none';
+    document.getElementById('batchDepartmentForm').style.display = 'none';
+    document.getElementById('BatchButton').style.display = 'none';
+    document.getElementById('footercontainer').style.display = 'none';
+    document.querySelector('nav.navbar').style.display = 'none';
+
+    
+
+    // Trigger the print
+    window.print();
+
+    // Optionally: After printing, restore the visibility of hidden elements (if necessary)
+    setTimeout(function () {
+        document.getElementById('downloadPDF').style.display = 'block';
+        document.getElementById('batchDepartmentForm').style.display = 'block';
+        document.getElementById('BatchButton').style.display = 'block';
+        document.querySelector('nav.navbar').style.display = 'block';
+
+    }, 100);
+});
     
     </script>
 </body>
