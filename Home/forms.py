@@ -7,7 +7,7 @@ class RegistrationForm(UserCreationForm):
         ('STUDENT', 'Student'),
         ('FACULTY', 'Faculty'),
     ]
-
+    name = forms.CharField(max_length=50, required=True)
     designation = forms.ChoiceField(choices=DESIGNATION_CHOICES, widget=forms.Select)
 
     class Meta:

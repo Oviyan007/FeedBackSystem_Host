@@ -1,3 +1,5 @@
+Navbar \previous code 
+
 {% extends 'home/layout.html'%}
 {% include 'home/header.html' %}
 
@@ -54,5 +56,3 @@
   </div>
 </nav>
 {% endblock %}
-
-

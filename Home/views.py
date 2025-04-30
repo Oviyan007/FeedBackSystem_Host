@@ -19,35 +19,64 @@ from django.db.models import Count,Q,Avg
 def Home(request):
     return render(request,'home/index.html')
 
+# def Register(request):
+#     if request.method == 'POST':
+#         form = RegistrationForm(request.POST)
+#         if form.is_valid():
+#             # Create the user
+           
+#             user = form.save()
+
+#             # Additional fields specific to UserProfile
+#             name = form.cleaned_data.get('name')
+
+#             # Check if 'name' is not empty before creating the UserProfile
+#             if name:
+#                 # Create UserProfile instance
+#                 user_profile = UserProfile(user=user, name=name, designation=form.cleaned_data['designation'])
+#                 user_profile.save()
+#             else:
+#                 # Handle the case where 'name' is empty (provide appropriate error handling or redirect)
+#                 print("Error: 'name' cannot be empty")
+
+#             messages.success(request,"Account has been created")
+
+#             # Log the user in
+        
+
+#             # Redirect to a success page or home page
+#             return redirect('Login')
+#         else:
+#             # Form is not valid, handle errors or log them for debugging
+#             print(form.errors)
+#     else:
+#         form = RegistrationForm()
+
+#     return render(request, 'home/register.html', {'form': form})
 def Register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            # Create the user
-           
-            user = form.save()
+            # Create User object but don't save to database yet
+            user = form.save(commit=False)
 
-            # Additional fields specific to UserProfile
-            name = form.cleaned_data.get('name')
+            # Set the role from form designation
+            user.role = form.cleaned_data['designation']
+            user.email = form.cleaned_data['email']
+            user.save()
 
-            # Check if 'name' is not empty before creating the UserProfile
-            if name:
-                # Create UserProfile instance
-                user_profile = UserProfile(user=user, name=name, designation=form.cleaned_data['designation'])
-                user_profile.save()
-            else:
-                # Handle the case where 'name' is empty (provide appropriate error handling or redirect)
-                print("Error: 'name' cannot be empty")
+            # Create associated UserProfile
+            name = form.cleaned_data['name']
+            UserProfile.objects.create(
+                user=user,
+                name=name,
+                email=user.email,
+                designation=user.role
+            )
 
-            messages.success(request,"Account has been created")
-
-            # Log the user in
-        
-
-            # Redirect to a success page or home page
+            messages.success(request, "Account has been created successfully.")
             return redirect('Login')
         else:
-            # Form is not valid, handle errors or log them for debugging
             print(form.errors)
     else:
         form = RegistrationForm()
@@ -70,7 +99,8 @@ def Loginview(request):
 
 def Logoutview(request):
     logout(request)
-    return redirect('Home')     
+    # request.session.pop('has_submitted', None)  # Remove the session variable
+    return redirect('Home')
 
 
 
@@ -120,15 +150,16 @@ def profile(request):
 #                 subject_id = request.POST.get(f'subject_{qno}')
 #                 subject = Subject_detail.objects.get(id=subject_id)
 
-#                 # Create and save a Feedback object
-#                 feedback = FeedbackRes(
-#                     department=selected_department,
-#                     Response=int(response),
-#                     Qno=int(qno),
-#                     subject_detail=subject,
-#                     batch_year=selected_batch_year
-#                 )
-#                 feedback.save()
+                # Create and save a Feedback object
+                feedback = FeedbackRes(
+                    department=selected_department,
+                    Response=int(response),
+                    Qno=int(qno),
+                    subject_detail=subject,
+                    batch_year=selected_batch_year
+                )
+                feedback.save()
+        request.session['has_submitted'] = True
 
 #     form = OptionForm()
 
@@ -336,9 +367,15 @@ def feedback_report_view(request):
     )
     #code for faculty name...
     # For each subject, find the related staff using the ManyToMany relationship
+    # for feedback in subject_feedback:
+    #     subject = Subject_detail.objects.get(sub_code=feedback['subject_detail__sub_code'])
+    #     feedback['staff_names'] = ', '.join([staff.name for staff in subject.staff_handling.all()])
     for feedback in subject_feedback:
-        subject = Subject_detail.objects.get(sub_code=feedback['subject_detail__sub_code'])
-        feedback['staff_names'] = ', '.join([staff.name for staff in subject.staff_handling.all()])
+        subject = Subject_detail.objects.filter(sub_code=feedback['subject_detail__sub_code']).first()
+        if subject:
+            feedback['staff_names'] = ', '.join([staff.name for staff in subject.staff_handling.all()])
+        else:
+            feedback['staff_names'] = 'N/A'
 
     context = {
         'subject_feedback': subject_feedback,
