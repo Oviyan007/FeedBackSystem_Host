@@ -1,282 +1,271 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback Report</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-    <style>
-        /* Flexbox for responsive layout */
-        .card-container {
+{% extends 'home/layout.html' %}
+{% load static %}
+{% include 'home/header.html' %}
+
+{% block body %}
+{% include 'home/navbar.html' %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+   .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 10px;
+    background-color: white;
+}
+
+.feedbackChart {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+}
+
+table, th, td {
+    border: 1px solid #000;
+    border-collapse: collapse;
+}
+
+table {
+    width: 100%;
+    margin: 20px 0;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+        .info-row {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px; /* Space between cards */
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .left-info {
+            text-align: left;
+        }
+        .right-info {
+            text-align: right;
         }
 
-        /* Card styles */
-        .card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px; /* Maximum width for each card */
-            margin: 10px;
-            background-color: white;
-        }
+@media (max-width: 768px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
 
-        .card h4 {
-            font-size: 1.2rem;
-            text-align: center;
-        }
+@media (max-width: 576px) {
+    th, td {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
 
-        /* Responsive canvas */
-        .feedbackChart {
-            width: 100%;
-            height: auto;
-            max-height: 400px;
-        }
-
-        /* Responsive typography */
-        h2 {
-            text-align: center;
-        }
-
-        /* table css  */
-        table,th,td{
-            border: 1px solid #000;
-            border-collapse: collapse;
-        }
-        table {
-            width: 100%;
-            margin: 20px 0;
-            
-            
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-           
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        /* Make the table responsive */
-        @media (max-width: 768px) {
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-        }
-
-        /* Styling for mobile view */
-        @media (max-width: 576px) {
-            th, td {
-                padding: 8px;
-                font-size: 14px;
-            }
-        }
-
-        /* Add some hover effect */
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-         /* Print-specific styles */
-    @media print {
-        /* Hide the select box and the filter button during printing */
-        #batchDepartmentForm, 
-        #BatchButton,
-        #downloadPDF {
-            display: none;
-        }
-    @media print {
+@media print {
+    #batchDepartmentForm,
+    #BatchButton,
+    #downloadPDF,
     nav.navbar {
-      display: none !important;
+        display: none !important;
     }
-  }
-        /* Ensure the table is properly displayed during printing */
-        table {
-            width: 100%;
-            page-break-inside: avoid;
-        }
-        
-    }
-    </style>
-</head>
-<body>
-    {% block body %}
-    {% include 'home/navbar.html' %}
 
-    <h2>Feedback Report</h2>
-    <div class="container">
-        <div class="row mt-4">
-            <form method="post" action="" id="batchDepartmentForm">
-                {% csrf_token %}
-                <select name="batch_year" id="batchSelect" required>
-                    <option value="">Select the batch</option>
-                    {% for ans in Batches %}
-                        <option value="{{ ans.Batchyear }}" {% if selected_batch == ans.Batchyear %}selected{% endif %}>
-                            {{ ans.Batchyear }}
-                        </option>
-                    {% endfor %}
-                </select>
-                <select name="department" id="departmentSelect" required>
-                    <option value="">Select the department</option>
-                    {% for ans in depart %}
-                        <option value="{{ ans.department }}" {% if selected_department == ans.department %}selected{% endif %}>
-                            {{ ans.department }}
-                        </option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn btn-primary" id="BatchButton">Filter</button>
-            </form>
+    table {
+        width: 100%;
+        page-break-inside: avoid;
+    }
+}
+
+</style>
+
+<div class="container my-4">
+    <h2 class="text-center mb-4">Dhanalakshmi Srinivasan Engineering College (Autonomous), Perambalur</h2>
+
+    <!-- Filter Form -->
+    <form method="post" id="batchDepartmentForm" class="row g-3 mb-4">
+        {% csrf_token %}
+        <div class="col-md-2">
+            <select name="batch_year" id="batchSelect" class="form-select" required>
+                <option value="">Select Batch</option>
+                {% for ans in Batches %}
+                    <option value="{{ ans.Batchyear }}" {% if selected_batch == ans.Batchyear %}selected{% endif %}>{{ ans.Batchyear }}</option>
+                {% endfor %}
+            </select>
         </div>
 
-        <!-- Card container for responsive layout -->
-        <div class="container" id="contentContainer" style="display: none;"> <!-- Hidden by default -->
-            <div class="card-container">
-                {% for subject in subject_feedback %}
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">{{ subject.subject_detail__sub_name }}</h4>
-                        <canvas id="feedbackChart-{{ forloop.counter }}" class="feedbackChart"></canvas>
-                    </div>
-
-                    <script>
-                        var ctx = document.getElementById('feedbackChart-{{ forloop.counter }}').getContext('2d');
-                        var feedbackChart = new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                                labels: ['Average', 'Good', 'Very Good', 'Excellent'],
-                                datasets: [{
-                                    label: 'Feedback for {{ subject.subject_detail__sub_name }}',
-                                    data: [
-                                        {{ subject.average_count|default:0 }},
-                                        {{ subject.good_count|default:0 }},
-                                        {{ subject.very_good_count|default:0 }},
-                                        {{ subject.excellent_count|default:0 }}
-                                    ],
-                                    backgroundColor: [
-                                        'rgba(255, 99, 132, 0.2)',
-                                        'rgba(54, 162, 235, 0.2)',
-                                        'rgba(75, 192, 192, 0.2)',
-                                        'rgba(153, 102, 255, 0.2)'
-                                    ],
-                                    borderColor: [
-                                        'rgba(255, 99, 132, 1)',
-                                        'rgba(54, 162, 235, 1)',
-                                        'rgba(75, 192, 192, 1)',
-                                        'rgba(153, 102, 255, 1)'
-                                    ],
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                scales: {
-                                    y: {
-                                        beginAtZero: true
-                                    }
-                                }
-                            }
-                        });
-                    </script>
-                </div>
+        <div class="col-md-2">
+            <select name="department" id="departmentSelect" class="form-select" required>
+                <option value="">Select Department</option>
+                {% for ans in depart %}
+                    <option value="{{ ans }}" {% if selected_department == ans %}selected{% endif %}>{{ ans }}</option>
                 {% endfor %}
-            </div>
+            </select>
+        </div>
 
-            <h2 style="text-align: center;">Subject-Wise Feedback Report</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>S.No</th>
-                        <th>Subject</th>
-                        <th>Faculty Name</th>
-                        <th>Average (2)</th>
-                        <th>Good (3)</th>
-                        <th>Very Good (4)</th>
-                        <th>Excellent (5)</th>
-                        <th>Average Score</th> <!-- New column for average score -->
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for subject in subject_feedback %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ subject.subject_detail__sub_name }}/{{ subject.subject_detail__sub_code }}</td>
-                            <td>{{ subject.staff_names }}</td>
-                            <td>{{ subject.average_count | stringformat:'.2f'}}</td>
-                            <td>{{ subject.good_count|default:0 }}</td>
-                            <td>{{ subject.very_good_count|default:0 }}</td>
-                            <td>{{ subject.excellent_count|default:0 }}</td>
-                            <td>{{ subject.average_score|default:"N/A" }}</td> 
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="col-md-2">
+            <select name="semester" id="semesterSelect" class="form-select" required>
+                <option value="">Select Semester</option>
+                {% for sem in semesters %}
+                    <option value="{{ sem }}" {% if selected_semester == sem|stringformat:"s" %}selected{% endif %}>{{ sem }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <select name="section" id="sectionSelect" class="form-select" required>
+                <option value="">Select Section</option>
+                {% for ans in sections %}
+                    <option value="{{ ans }}" {% if selected_section == ans %}selected{% endif %}>{{ ans }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary" id="BatchButton">Filter</button>
+        </div>
+    </form>
+
+    {% if subject_feedback %}
+    <div id="contentContainer">
+        <!-- College Name Header -->
+    
+
+    <!-- Info Row: Left (Batch/Dept/etc) and Right (Response count) -->
+    <div class="info-row">
+        <div class="left-info">
+            <p>
+                <strong>Batch:</strong> {{ selected_batch }} |
+                <strong>Department:</strong> {{ selected_department }} |
+                <strong>Semester:</strong> {{ selected_semester }} |
+                <strong>Section:</strong> {{ selected_section }}
+            </p>
+        </div>
+        <div class="right-info">
+            <p><strong>Total Responses:</strong> {{ total_response_count }}</p>
+        </div>
+    </div>
+
+        <div class="card-container">
+
+            {% for subject in subject_feedback %}
+            <div class="card">
+                <h4>{{ subject.subject_detail__sub_name }}</h4>
+                <canvas id="feedbackChart-{{ forloop.counter }}" class="feedbackChart"></canvas>
+                <script>
+                    const ctx{{ forloop.counter }} = document.getElementById('feedbackChart-{{ forloop.counter }}').getContext('2d');
+                    new Chart(ctx{{ forloop.counter }}, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Average', 'Good', 'Very Good', 'Excellent'],
+                            datasets: [{
+                                label: '{{ subject.subject_detail__sub_name }}',
+                                data: [
+                                    {{ subject.average_count|default:0 }},
+                                    {{ subject.good_count|default:0 }},
+                                    {{ subject.very_good_count|default:0 }},
+                                    {{ subject.excellent_count|default:0 }}
+                                ],
+                                backgroundColor: ['#f87171', '#60a5fa', '#34d399', '#c084fc'],
+                                borderColor: ['#ef4444', '#3b82f6', '#10b981', '#a855f7'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                </script>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="mt-5">Subject-Wise Feedback Report</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Subject</th>
+                    <th>Faculty Name</th>
+                    <th>Average (2)</th>
+                    <th>Good (3)</th>
+                    <th>Very Good (4)</th>
+                    <th>Excellent (5)</th>
+                    <th>Average Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subject_feedback %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ subject.subject_detail__sub_name }}/{{ subject.subject_detail__sub_code }}</td>
+                    <td>{{ subject.staff_names }}</td>
+                    <td>{{ subject.average_count|floatformat:2 }}</td>
+                    <td>{{ subject.good_count|default:0 }}</td>
+                    <td>{{ subject.very_good_count|default:0 }}</td>
+                    <td>{{ subject.excellent_count|default:0 }}</td>
+                    <td>{{ subject.average_score|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="text-center my-4">
             <button id="downloadPDF" class="btn btn-secondary">Download as PDF</button>
         </div>
     </div>
-    {% endblock %}
-    
-    <script>  
-        // JavaScript to toggle content visibility based on batch and department selection
-        window.addEventListener('load', function () {
-            var batchSelect = document.getElementById('batchSelect');
-            var departmentSelect = document.getElementById('departmentSelect');
-            var contentContainer = document.getElementById('contentContainer');
-            var batchForm = document.getElementById('batchDepartmentForm');
-    
-            // Check if both batch and department are selected on page load
-            toggleContentVisibility();
-    
-            // Add event listener for form submission
-            batchForm.addEventListener('submit', function(event) {
-                toggleContentVisibility();
-            });
-    
-            function toggleContentVisibility() {
-                // Check if both batch and department are selected
-                if (batchSelect.value !== '' && departmentSelect.value !== '') {
-                    contentContainer.style.display = 'block';
-                } else {
-                    contentContainer.style.display = 'none';
-                }
-            }
-        });
-         
-    
-        document.getElementById('downloadPDF').addEventListener('click', function () {
-    // Hide certain elements for printing
-    document.getElementById('downloadPDF').style.display = 'none';
-    document.getElementById('batchDepartmentForm').style.display = 'none';
-    document.getElementById('BatchButton').style.display = 'none';
-    document.getElementById('footercontainer').style.display = 'none';
-    document.querySelector('nav.navbar').style.display = 'none';
+    {% endif %}
+</div>
 
-    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const batch = document.getElementById('batchSelect');
+        const dept = document.getElementById('departmentSelect');
+        const sem = document.getElementById('semesterSelect');
+        const section = document.getElementById('sectionSelect');
+        const container = document.getElementById('contentContainer');
 
-    // Trigger the print
-    window.print();
+        const showContent = batch.value && dept.value && sem.value && section.value;
+        container.style.display = showContent ? 'block' : 'none';
+    });
 
-    // Optionally: After printing, restore the visibility of hidden elements (if necessary)
-    setTimeout(function () {
-        document.getElementById('downloadPDF').style.display = 'block';
-        document.getElementById('batchDepartmentForm').style.display = 'block';
-        document.getElementById('BatchButton').style.display = 'block';
-        document.querySelector('nav.navbar').style.display = 'block';
+    document.getElementById('downloadPDF').addEventListener('click', function () {
+        document.getElementById('downloadPDF').style.display = 'none';
+        document.getElementById('batchDepartmentForm').style.display = 'none';
+        document.getElementById('BatchButton').style.display = 'none';
+        document.querySelector('nav.navbar').style.display = 'none';
 
-    }, 100);
-});
-    
-    </script>
-</body>
+        window.print();
 
-</html>
-{% include 'home/footer.html' %} 
+        setTimeout(() => {
+            document.getElementById('downloadPDF').style.display = 'block';
+            document.getElementById('batchDepartmentForm').style.display = 'flex';
+            document.getElementById('BatchButton').style.display = 'block';
+            document.querySelector('nav.navbar').style.display = 'block';
+        }, 100);
+    });
+</script>
+
+{% endblock %}

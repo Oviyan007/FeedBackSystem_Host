@@ -14,6 +14,7 @@
             <div class="row mt-4">
                 <form method="post" action="" id="batchDepartmentForm">
                     {% csrf_token %}
+                    Batch:
                     <select name="year" id="batchSelect">
                         <option>Select the batch</option>
                         {% for ans in Batches %}
@@ -22,12 +23,27 @@
                         
                         {% endfor %}
                     </select>
+                    Department:
                     <select name="department" id="departmentSelect">
                         <option>Select the department</option>
                         {% for ans in depart %}
                             <option>{{ ans.department }}</option>
                         {% endfor %}
                     </select>
+                    {% if sections %}
+    <label for="sectionSelect">Section:</label>
+    <select name="section" id="sectionSelect" required>
+        <option value="" disabled {% if not selected_section %}selected{% endif %}>Select Section</option>
+        {% for section in sections %}
+            <option value="{{ section }}" {% if section == selected_section %}selected{% endif %}>{{ section }}</option>
+        {% endfor %}
+    </select>
+{% endif %}
+
+
+
+
+                    Semester:
                     <select name="semester" id="semester">
                         <option value="">Select the Semester</option>
                         <option value="1">1</option>
@@ -54,573 +70,992 @@
                     {% if user.role == 'STUDENT'%}
                 
                             <!-- code for question 1 -->
-                                <div class="container mt-4" >
-                                    <div class="row">
-                                        <div class="form-check" style="text-align: left;">
-                                            <p class="font-weight-bold text-center"><strong>  A . Time Management</strong></p>
-                                                <label class="from-check-label font-weight-bold">Punctuality of the Faculty to the class</label>
-                                                
-                                                {% for sub in subjects %}
-                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                                    {% for choice in form.options.field.widget.choices %}
-                                                                    <div class="form-check d-inline">
-                                                                        <!-- Unique name for this question -->
-                                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_1" value="{{ choice.0 }}" required>
-                                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_1_{{ choice.0 }}">
-                                                                            {{ choice.1 }}
-                                                                        </label>
-                                                                    </div>
-                                                                    {% endfor %}
-                                                                    
-                                                                    <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
-                                                                    <input type="hidden" name="Qno" value="{{ forloop.counter }}">
-                                                                    <input type="hidden" name="year" value="{{ request.POST.year }}">
-                                                                    <input type="hidden" name="department" value="{{ request.POST.department }}">
-                                                                {% endfor %}
-                                            </div>
-                                    </div>
-                                    <hr>
-                                        <!-- code for question 1 end -->
-                                        <!-- code for question 2 -->
+                            <div class="container mt-4">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="font-weight-bold text-center"><strong>A. Time Management</strong></p>
+                                        <label class="font-weight-bold">Punctuality of the Faculty to the class</label>
                                         <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    <label class="from-check-label font-weight-bold">Regularity of the Faculty in taking classes</label>
-                                                    
+                                            <!-- Left Column: Question -->
+                                            <div class="col-md-6">
+                                                <div class="form-check" style="text-align: left;">
                                                     {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_2" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_2_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
+                                                        <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
                                                     {% endfor %}
-                            
-                                                {% endfor %}
                                                 </div>
+                                            </div>
+                                            
+                                            <!-- Right Column: Options (Radio Buttons) -->
+                                            <div class="col-md-6">
+                                                <div class="form-check" style="text-align: left;">
+                                                    {% for sub in subjects %}
+                                                        <div class="form-check">
+                                                            {% for choice in form.options.field.widget.choices %}
+                                                                <div class="form-check d-inline-block mr-3 mb-2">
+                                                                    <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_1" value="{{ choice.0 }}" required>
+                                                                    <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_1_{{ choice.0 }}">
+                                                                        {{ choice.1 }}
+                                                                    </label>
+                                                                </div>
+                                                            {% endfor %}
+                                                            <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                            <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                            <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                            <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
                                         </div>
                                         <hr>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                                        <!-- code for question 1 end -->
+                                        <!-- code for question 2 -->
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <p class="font-weight-bold text-center"><strong>B. Subject Delivery</strong></p>
+                                                    <label class="font-weight-bold">Regularity of the Faculty in taking classes</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Question -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Right Column: Options (Radio Buttons) -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_2" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_2_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                        <input type="hidden" name="section" value="{{ request.POST.section }}">
+
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
                                             <!-- code for question 2 end -->
                                         <!-- code for question 3 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    <label class="from-check-label font-weight-bold">Complete syllabus of the course in time for AT/Model Test</label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_3" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_3_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <p class="font-weight-bold text-center"><strong>C. Interaction</strong></p>
+                                                    <label class="font-weight-bold">Complete syllabus of the course in time for AT/Model Test</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Question -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Right Column: Options (Radio Buttons) -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_3" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_3_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
-                                            <hr>
+                                        </div>
+                                        
                                             <!-- code for question 3 end -->
                                         <!-- code for question 4 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    <label class="from-check-label font-weight-bold">Regularity of the Faculty in taking attendance in classes</label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_4" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_4_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <p class="font-weight-bold text-center"><strong>D. Attendance Management</strong></p>
+                                                    <label class="font-weight-bold">Regularity of the Faculty in taking attendance in classes</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Question -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Right Column: Options (Radio Buttons) -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_4" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_4_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
+                                        </div>
+                                        
                                             <!-- code for question 4 end -->
                                             <!-- code for question 5 -->
                                             <hr>
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    <p class="font-weight-bold text-center">B. Planning and Preparation of Subject Matters</p>
-                                                    <label class="from-check-label font-weight-bold">Focus on Syllabi </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_5" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_5_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                            <div class="container mt-4">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <p class="font-weight-bold text-center"><strong>B. Planning and Preparation of Subject Matters</strong></p>
+                                                        <label class="font-weight-bold">Focus on Syllabi</label>
+                                                        <div class="row">
+                                                            <!-- Left Column: Question -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-check" style="text-align: left;">
+                                                                    {% for sub in subjects %}
+                                                                        <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Right Column: Options (Radio Buttons) -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-check" style="text-align: left;">
+                                                                    {% for sub in subjects %}
+                                                                        <div class="form-check">
+                                                                            {% for choice in form.options.field.widget.choices %}
+                                                                                <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                    <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_5" value="{{ choice.0 }}" required>
+                                                                                    <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_5_{{ choice.0 }}">
+                                                                                        {{ choice.1 }}
+                                                                                    </label>
+                                                                                </div>
+                                                                            {% endfor %}
+                                                                            <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                            <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                            <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                            <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                        </div>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
                                                 </div>
-                                            </div>
-                                            <hr>
+                                            </div>                                            
                                             <!-- code for question 5 end -->
                                         <!-- code for question 6 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Communication Skill  </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_6" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_6_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label class="font-weight-bold">Communication Skill</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Question -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Right Column: Options (Radio Buttons) -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_6" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_6_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
-                                            <hr>
+                                        </div>
+                                        
                                             <!-- code for question 6 end -->
                                         <!-- code for question 7 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Teaching the subject matter   </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_7" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_7_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
+                                        <!-- code for question subject7 -->
+
+
+
                                             <hr>
                                             <!-- code for question 7 end -->
                                         <!-- code for question 8 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Skill of Linking subject to other subject  </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_8" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_8_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label class="font-weight-bold">Teaching the subject matter</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Question -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Right Column: Options (Radio Buttons) -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_7" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_7_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
-                                            <hr>
+                                        </div>
+                                        
                                             <!-- code for question 8 end -->
                                         <!-- code for question 9 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Assignment Strategies Followed  </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_9" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_9_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label class="font-weight-bold">Assignment Strategies Followed</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Question -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Right Column: Options (Radio Buttons) -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_9" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_9_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
-                                            <hr>
+                                        </div>
+                                        
                                             <!-- code for question 9 end -->
                                         <!-- code for question 10 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    <p class="font-weight-bold text-center">C . Methodology of Teaching</p>
-                                                    <label class="from-check-label font-weight-bold">Use of Teaching aids (OHP, Black Board, PPT, Models / Simulation) </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_10" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_10_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <p class="font-weight-bold text-center">C. Methodology of Teaching</p>
+                                                    <label class="font-weight-bold">Use of Teaching aids (OHP, Black Board, PPT, Models / Simulation)</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Question -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Right Column: Options (Radio Buttons) -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_10" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_10_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
-                                            <hr>
+                                        </div>
+                                        
                                             <!-- code for question 10 end -->
                                         <!-- code for question 11 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Uses of involving Teaching Methods  </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_11" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_11_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label class="font-weight-bold">Uses of involving Teaching Methods</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Subject Information -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Right Column: Options (Radio Buttons) -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_11" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_11_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
-                                            <hr>
+                                        </div>
+                                        
                                             <!-- code for question 11 end -->
                                         <!-- code for question 12 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Clarify students doubt in the class  </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_12" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_12_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label class="font-weight-bold">Clarify students doubt in the class</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Subject Information -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                        
+                                                        <!-- Right Column: Options -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check mb-3">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_12" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_12_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <!-- Hidden fields for context (optional) -->
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
-                                            <hr>
+                                        </div>
+                                        
                                             <!-- code for question 12 end -->
                                         <!-- code for question 13 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    <p class="font-weight-bold text-center">D . Faculty Attitude</p>
-                                                    <label class="from-check-label font-weight-bold">Helping approach towards varied responsibility to the institution  </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_13" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_13_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <p class="font-weight-bold text-center">D. Faculty Attitude</p>
+                                                    <label class="font-weight-bold">Helping approach towards varied responsibility to the institution</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Subject Info -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                        
+                                                        <!-- Right Column: Options -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check mb-3">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_13" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_13_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <!-- Optional hidden context fields -->
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
-                                            <hr>
+                                        </div>
+                                        
                                             <!-- code for question 13 end -->
                                         <!-- code for question 14 -->
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Posture and Gesture   </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_14" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_14_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label class="font-weight-bold">Posture and Gesture</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Subject Info -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                        
+                                                        <!-- Right Column: Options -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in subjects %}
+                                                                    <div class="form-check mb-3">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_14" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_14_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <!-- Optional hidden fields -->
+                                                                        <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
+                                        </div>
+                                        
                                             <!-- code for question 14 end -->
                                             <!-- code for question 15 -->
                                             <hr>
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Towards paper Evaluation and personal remark making  </label>
-                                                    {% for sub in subjects %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_15" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_15_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                            <div class="container mt-4">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <label class="font-weight-bold">Towards paper Evaluation and personal remark making</label>
+                                                        <div class="row">
+                                                            <!-- Left Column: Subject Info -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-check" style="text-align: left;">
+                                                                    {% for sub in subjects %}
+                                                                        <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                            
+                                                            <!-- Right Column: Options -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-check" style="text-align: left;">
+                                                                    {% for sub in subjects %}
+                                                                        <div class="form-check mb-3">
+                                                                            {% for choice in form.options.field.widget.choices %}
+                                                                                <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                    <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_15" value="{{ choice.0 }}" required>
+                                                                                    <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_15_{{ choice.0 }}">
+                                                                                        {{ choice.1 }}
+                                                                                    </label>
+                                                                                </div>
+                                                                            {% endfor %}
+                                                                            <!-- Optional hidden fields -->
+                                                                            <input type="hidden" name="subject_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                            <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                            <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                            <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                        </div>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
                                                 </div>
                                             </div>
-                                            <hr>
+                                            
                                             <!-- code for question 15 end -->
                                             <!-- lab question start -->
                                         <!-- code for question lab16 -->
-                                        <div class="row">
-                                            <p class="font-weight-bold text-center">Laboratory FeedBack</p>
-                                        </div>
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Do you have enough tools and equipments to carry out Lab practices individually?  </label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_16" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_16_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <p class="font-weight-bold text-center">Laboratory Feedback</p>
+                                                    <label class="font-weight-bold">Do you have enough tools and equipment to carry out Lab practices individually?</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Lab Subjects -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in labs %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                        
+                                                        <!-- Right Column: Radio Options -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in labs %}
+                                                                    <div class="form-check mb-3">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_16" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_16_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <!-- Hidden Metadata -->
+                                                                        <input type="hidden" name="lab_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
-                                            <hr>
+                                        </div>
+                                        
                                             <!-- code for question 16 end -->
                                         <!-- code for question lab17 -->
                                     
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Is the Lab clean, neat and spacious ? </label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_17" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_17_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
+                                        <div class="container mt-4">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label class="font-weight-bold">Is the Lab clean, neat and spacious?</label>
+                                                    <div class="row">
+                                                        <!-- Left Column: Lab Subjects -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in labs %}
+                                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                        
+                                                        <!-- Right Column: Radio Options -->
+                                                        <div class="col-md-6">
+                                                            <div class="form-check" style="text-align: left;">
+                                                                {% for sub in labs %}
+                                                                    <div class="form-check mb-3">
+                                                                        {% for choice in form.options.field.widget.choices %}
+                                                                            <div class="form-check d-inline-block mr-3 mb-2">
+                                                                                <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_17" value="{{ choice.0 }}" required>
+                                                                                <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_17_{{ choice.0 }}">
+                                                                                    {{ choice.1 }}
+                                                                                </label>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                        <!-- Hidden Fields for each lab subject -->
+                                                                        <input type="hidden" name="lab_{{ forloop.counter }}" value="{{ sub.id }}">
+                                                                        <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                                                        <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                                                        <input type="hidden" name="department" value="{{ request.POST.department }}">
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
+                                                    <hr>
                                                 </div>
                                             </div>
+                                        </div>
+                                        
                                             <hr>
                                             <!-- code for question 17 end -->
                                         <!-- code for question lab18 -->
-                                        
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Are there enough safety precautions available in the Lab?   </label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_18" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_18_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <!-- code for question 18 end -->
-                                            <!-- code for question lab19 -->
-                                            <hr>
-                                        
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">How do you feel about the timings allotted to carry out each exercises ?   </label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_19" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_19_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <!-- code for question lab19 end -->
-                                            <!-- code for question lab20 -->
-                                            <hr>
-                                        
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">How do you feel about the timings given to complete the lab records?    </label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_20" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_20_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <hr>
-                                            <!-- code for question lab20 end -->
-                                            <!-- code for question lab21 -->
-                                        
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Does the Lab-in charge and Lab instructors guide you to carry out exercises smoothly ?</label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_21" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_21_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <hr>
-                                            <!-- code for question lab21 end -->
-                                            <!-- code for question lab22 -->
-                                        
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                
-                                                    <label class="from-check-label font-weight-bold">Is your Lab-in charge open-minded and Unbiased ?</label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_22" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_22_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <hr>
-                                            <!-- code for question lab22 end -->
-                                        <!-- code for question lab23 -->
-                                        
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Are the numbers of Lab instructors enough to help you in doing the work ?</label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_23" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_23_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <hr>
-                                            <!-- code for question lab23 end -->
-                                        <!-- code for question lab24 -->
-                                        
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Are you free to express your inabilities, inconveniences and needs if any in the workshop ?</label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_24" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_24_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <hr>
-                                            <!-- code for question lab24 end -->
-                                        <!-- code for question lab25 -->
-                                        
-                                        <div class="row">
-                                            <div class="form-check" style="text-align: left;">
-                                                    
-                                                    <label class="from-check-label font-weight-bold">Is the entire Lab session, memorable and useful?</label>
-                                                    {% for sub in labs %}
-                                                    <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
-                                                    {% for choice in form.options.field.widget.choices %}
-                                                    <div class="form-check d-inline">
-                                                        <!-- Unique name for this question -->
-                                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_25" value="{{ choice.0 }}" required>
-                                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_25_{{ choice.0 }}">
-                                                            {{ choice.1 }}
-                                                        </label>
-                                                    </div>
-                                                    {% endfor %}
-                                                    
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <hr>
-                                            <!-- code for question lab25 end -->
-                                            <!-- lab questionended -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <label class="font-weight-bold">Are there enough safety precautions available in the Lab?</label>
+            <div class="row">
+                <!-- Left Column: Lab Subjects -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Right Column: Radio Options -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <div class="form-check mb-3">
+                                {% for choice in form.options.field.widget.choices %}
+                                    <div class="form-check d-inline-block mr-3 mb-2">
+                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_18" value="{{ choice.0 }}" required>
+                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_18_{{ choice.0 }}">
+                                            {{ choice.1 }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <!-- Hidden Fields for each lab subject -->
+                                <input type="hidden" name="lab_{{ forloop.counter }}" value="{{ sub.id }}">
+                                <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                <input type="hidden" name="department" value="{{ request.POST.department }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+</div>
+<hr>
+<!-- code for question lab18 end -->
+
+<!-- code for question lab19 -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <label class="font-weight-bold">How do you feel about the timings allotted to carry out each exercise?</label>
+            <div class="row">
+                <!-- Left Column: Lab Subjects -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Right Column: Radio Options -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <div class="form-check mb-3">
+                                {% for choice in form.options.field.widget.choices %}
+                                    <div class="form-check d-inline-block mr-3 mb-2">
+                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_19" value="{{ choice.0 }}" required>
+                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_19_{{ choice.0 }}">
+                                            {{ choice.1 }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <!-- Hidden Fields for each lab subject -->
+                                <input type="hidden" name="lab_{{ forloop.counter }}" value="{{ sub.id }}">
+                                <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                <input type="hidden" name="department" value="{{ request.POST.department }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+</div>
+<hr>
+<!-- code for question lab19 end -->
+
+<!-- code for question lab20 -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <label class="font-weight-bold">How do you feel about the timings given to complete the lab records?</label>
+            <div class="row">
+                <!-- Left Column: Lab Subjects -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Right Column: Radio Options -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <div class="form-check mb-3">
+                                {% for choice in form.options.field.widget.choices %}
+                                    <div class="form-check d-inline-block mr-3 mb-2">
+                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_20" value="{{ choice.0 }}" required>
+                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_20_{{ choice.0 }}">
+                                            {{ choice.1 }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <!-- Hidden Fields for each lab subject -->
+                                <input type="hidden" name="lab_{{ forloop.counter }}" value="{{ sub.id }}">
+                                <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                <input type="hidden" name="department" value="{{ request.POST.department }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+</div>
+<hr>
+<!-- code for question lab20 end -->
+
+<!-- code for question lab21 -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <label class="font-weight-bold">Does the Lab-in charge and Lab instructors guide you to carry out exercises smoothly?</label>
+            <div class="row">
+                <!-- Left Column: Lab Subjects -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Right Column: Radio Options -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <div class="form-check mb-3">
+                                {% for choice in form.options.field.widget.choices %}
+                                    <div class="form-check d-inline-block mr-3 mb-2">
+                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_21" value="{{ choice.0 }}" required>
+                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_21_{{ choice.0 }}">
+                                            {{ choice.1 }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <!-- Hidden Fields for each lab subject -->
+                                <input type="hidden" name="lab_{{ forloop.counter }}" value="{{ sub.id }}">
+                                <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                <input type="hidden" name="department" value="{{ request.POST.department }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+</div>
+<hr>
+<!-- code for question lab21 end -->
+
+<!-- code for question lab22 -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <label class="font-weight-bold">Is your Lab-in charge open-minded and Unbiased?</label>
+            <div class="row">
+                <!-- Left Column: Lab Subjects -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Right Column: Radio Options -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <div class="form-check mb-3">
+                                {% for choice in form.options.field.widget.choices %}
+                                    <div class="form-check d-inline-block mr-3 mb-2">
+                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_22" value="{{ choice.0 }}" required>
+                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_22_{{ choice.0 }}">
+                                            {{ choice.1 }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <!-- Hidden Fields for each lab subject -->
+                                <input type="hidden" name="lab_{{ forloop.counter }}" value="{{ sub.id }}">
+                                <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                <input type="hidden" name="department" value="{{ request.POST.department }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+</div>
+<hr>
+<!-- code for question lab22 end -->
+
+<!-- code for question lab23 -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <label class="font-weight-bold">Are the numbers of Lab instructors enough to help you in doing the work?</label>
+            <div class="row">
+                <!-- Left Column: Lab Subjects -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <p class="text-muted"><strong>{{ sub.sub_code }}/{{ sub.sub_name }}</strong></p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Right Column: Radio Options -->
+                <div class="col-md-6">
+                    <div class="form-check" style="text-align: left;">
+                        {% for sub in labs %}
+                            <div class="form-check mb-3">
+                                {% for choice in form.options.field.widget.choices %}
+                                    <div class="form-check d-inline-block mr-3 mb-2">
+                                        <input class="form-check-input" type="radio" name="response_{{ forloop.parentloop.counter }}_23" value="{{ choice.0 }}" required>
+                                        <label class="form-check-label" for="option{{ forloop.parentloop.counter }}_23_{{ choice.0 }}">
+                                            {{ choice.1 }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                <!-- Hidden Fields for each lab subject -->
+                                <input type="hidden" name="lab_{{ forloop.counter }}" value="{{ sub.id }}">
+                                <input type="hidden" name="Qno" value="{{ forloop.counter }}">
+                                <input type="hidden" name="year" value="{{ request.POST.year }}">
+                                <input type="hidden" name="department" value="{{ request.POST.department }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+</div>
+<hr>
+<!-- code for question lab23 end -->
+
+
+
                                         
                                             
                                             

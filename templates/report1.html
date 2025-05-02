@@ -1,0 +1,248 @@
+{% extends 'home/layout.html' %}
+{% load static %}
+{% include 'home/header.html'%}
+
+{% block content %}
+{% include 'home/navbar.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 10px;
+            background-color: white;
+        }
+
+        .card h4 {
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .feedbackChart {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        table, th, td {
+            border: 1px solid #000;
+            border-collapse: collapse;
+        }
+
+        table {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 576px) {
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        @media print {
+            #batchDepartmentForm, #BatchButton, #downloadPDF, nav.navbar {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-4">
+        <h2 class="text-center mb-4">Feedback Report</h2>
+
+        <!-- Filter Form -->
+        <form method="post" action="" id="batchDepartmentForm" class="row g-3 mb-4">
+            {% csrf_token %}
+            <div class="col-md-3">
+                <select name="batch_year" id="batchSelect" class="form-select" required>
+                    <option value="">Select the batch</option>
+                    {% for ans in Batches %}
+                        <option value="{{ ans.Batchyear }}" {% if selected_batch == ans.Batchyear %}selected{% endif %}>{{ ans.Batchyear }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="department" id="departmentSelect" class="form-select" required>
+                    <option value="">Select the department</option>
+                    {% for ans in depart %}
+                        <option value="{{ ans.department }}" {% if selected_department == ans.department %}selected{% endif %}>{{ ans.department }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="section" id="sectionSelect" class="form-select" required>
+                    <option value="">Select the section</option>
+                    {% for ans in sections %}
+                        <option value="{{ ans.section }}" {% if selected_section == ans.section %}selected{% endif %}>{{ ans.section }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary" id="BatchButton">Filter</button>
+            </div>
+        </form>
+
+        {% if subject_feedback %}
+        <div id="contentContainer">
+            <!-- Chart Cards -->
+            <div class="card-container">
+                {% for subject in subject_feedback %}
+                <div class="card">
+                    <h4>{{ subject.subject_detail__sub_name }}</h4>
+                    <canvas id="feedbackChart-{{ forloop.counter }}" class="feedbackChart"></canvas>
+                    <script>
+                        const ctx{{ forloop.counter }} = document.getElementById('feedbackChart-{{ forloop.counter }}').getContext('2d');
+                        new Chart(ctx{{ forloop.counter }}, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Average', 'Good', 'Very Good', 'Excellent'],
+                                datasets: [{
+                                    label: '{{ subject.subject_detail__sub_name }}',
+                                    data: [
+                                        {{ subject.average_count|default:0 }},
+                                        {{ subject.good_count|default:0 }},
+                                        {{ subject.very_good_count|default:0 }},
+                                        {{ subject.excellent_count|default:0 }}
+                                    ],
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.2)',
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(75, 192, 192, 0.2)',
+                                        'rgba(153, 102, 255, 0.2)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Feedback Table -->
+            <h2 class="mt-5">Subject-Wise Feedback Report</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Subject</th>
+                        <th>Faculty Name</th>
+                        <th>Average (2)</th>
+                        <th>Good (3)</th>
+                        <th>Very Good (4)</th>
+                        <th>Excellent (5)</th>
+                        <th>Average Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subject_feedback %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ subject.subject_detail__sub_name }}/{{ subject.subject_detail__sub_code }}</td>
+                        <td>{{ subject.staff_names }}</td>
+                        <td>{{ subject.average_count|floatformat:2 }}</td>
+                        <td>{{ subject.good_count|default:0 }}</td>
+                        <td>{{ subject.very_good_count|default:0 }}</td>
+                        <td>{{ subject.excellent_count|default:0 }}</td>
+                        <td>{{ subject.average_score|default:"N/A" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="text-center my-4">
+                <button id="downloadPDF" class="btn btn-secondary">Download as PDF</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Toggle content visibility
+        document.addEventListener('DOMContentLoaded', function () {
+            const batch = document.getElementById('batchSelect');
+            const dept = document.getElementById('departmentSelect');
+            const section = document.getElementById('sectionSelect');
+            const container = document.getElementById('contentContainer');
+
+            if (batch.value !== '' && dept.value !== '' && section.value !== '') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        });
+
+        // Print to PDF
+        document.getElementById('downloadPDF').addEventListener('click', function () {
+            document.getElementById('downloadPDF').style.display = 'none';
+            document.getElementById('batchDepartmentForm').style.display = 'none';
+            document.getElementById('BatchButton').style.display = 'none';
+            document.querySelector('nav.navbar').style.display = 'none';
+
+            window.print();
+
+            setTimeout(() => {
+                document.getElementById('downloadPDF').style.display = 'block';
+                document.getElementById('batchDepartmentForm').style.display = 'flex';
+                document.getElementById('BatchButton').style.display = 'block';
+                document.querySelector('nav.navbar').style.display = 'block';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}

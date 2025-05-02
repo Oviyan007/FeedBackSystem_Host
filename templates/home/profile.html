@@ -1,41 +1,25 @@
 {% extends 'home/layout.html' %}
-{% include 'home/header.html' %} 
-
-{% block body  %}
+{% block body %}
 {% include 'home/navbar.html' %}
-<div class="container" style="margin-top: 100px;">
-    
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="text-uppercase page-header text-primary">Profile Page </h1>
+<div class="container mt-5">
+    <h2 class="text-primary">Profile Page</h2>
+    <form method="POST" class="mt-4">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success mt-2">Save Changes</button>
+            </div>
         </div>
-    </div>
-    <div class="row d-flex justify-content-center align-items-center">
-        <div class="col-md-6 mt-5">
-            <table class="table">
-                <tr>
-                    
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Role</th>
-                </tr>
-                <tr>
-                <td>{{user.name}}</td>
-                <td>{{user.email}}</td>
-                <td>{{user.role}}</td></tr>
-            </table>
-        </div>
-    </div>
-        
-          
+    </form>
 
-            
-
-            
-           
-   
+    <hr>
+    <h4 class="mt-5">Your Profile Info</h4>
+    <table class="table">
+        <tr><th>Name</th><td>{{ profile.name }}</td></tr>
+        <tr><th>Email</th><td>{{ profile.email }}</td></tr>
+        <tr><th>Role</th><td>{{ profile.designation }}</td></tr>
+        <tr><th>Batch</th><td>{{ profile.batch }}</td></tr>
+    </table>
 </div>
-
-    
-{% include 'home/footer.html' %} 
 {% endblock %}

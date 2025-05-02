@@ -1,88 +1,84 @@
-
-from django.shortcuts import render,redirect,HttpResponse
-from .forms import RegistrationForm
-from django.contrib.auth import authenticate, login,logout
-from django.contrib.auth.views import LoginView
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import *
-
-from .models import *
-from django.db.models import Count,Q,Avg
-
-
-
-
-
+from .forms import RegistrationForm, OptionForm, ProfileEditForm
+from .models import UserProfile, FeedbackRes, Subject_detail, Batch, BatchSection,Faculty
+from django.db.models import Count, Avg, Q, F
 
 
 def Home(request):
-    return render(request,'home/index.html')
+    return render(request, 'home/index.html')
+
 
 # def Register(request):
 #     if request.method == 'POST':
 #         form = RegistrationForm(request.POST)
 #         if form.is_valid():
-#             # Create the user
-           
-#             user = form.save()
+#             # Save the user and create UserProfile at the same time
+#             user = form.save(commit=False)
+#             user.save()
 
-#             # Additional fields specific to UserProfile
-#             name = form.cleaned_data.get('name')
+#             # Optionally, create the UserProfile explicitly if not done in the form
+#             UserProfile.objects.create(
+#                 user=user,
+#                 name=form.cleaned_data['name'],
+#                 email=user.email,
+#                 designation=form.cleaned_data['designation']
+#             )
 
-#             # Check if 'name' is not empty before creating the UserProfile
-#             if name:
-#                 # Create UserProfile instance
-#                 user_profile = UserProfile(user=user, name=name, designation=form.cleaned_data['designation'])
-#                 user_profile.save()
-#             else:
-#                 # Handle the case where 'name' is empty (provide appropriate error handling or redirect)
-#                 print("Error: 'name' cannot be empty")
-
-#             messages.success(request,"Account has been created")
-
-#             # Log the user in
-        
-
-#             # Redirect to a success page or home page
+#             messages.success(request, "Account has been created successfully.")
 #             return redirect('Login')
 #         else:
-#             # Form is not valid, handle errors or log them for debugging
 #             print(form.errors)
 #     else:
 #         form = RegistrationForm()
-
+    
 #     return render(request, 'home/register.html', {'form': form})
 def Register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            # Create User object but don't save to database yet
-            user = form.save(commit=False)
+            designation = form.cleaned_data['designation']
+            faculty_code = form.cleaned_data.get('faculty_code', '').strip()
 
-            # Set the role from form designation
-            user.role = form.cleaned_data['designation']
-            user.email = form.cleaned_data['email']
+            if designation == 'faculty':
+                # Check if the faculty code is valid
+                if not Faculty.objects.filter(faculty_code=faculty_code).exists():
+                    messages.error(request, "Invalid faculty code. Please contact admin.")
+                    return render(request, 'home/register.html', {'form': form})
+
+            # Save user
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password1'])  # Ensure password is hashed
+
+            # Set the role based on the designation
+            user.role = 'FACULTY' if designation == 'faculty' else 'STUDENT'
+
             user.save()
 
-            # Create associated UserProfile
-            name = form.cleaned_data['name']
+            # Create a UserProfile and set designation
             UserProfile.objects.create(
                 user=user,
-                name=name,
+                name=form.cleaned_data['name'],
                 email=user.email,
-                designation=user.role
+                designation=designation  # Ensure designation is set here
             )
 
             messages.success(request, "Account has been created successfully.")
             return redirect('Login')
         else:
+            # In case of invalid form, print errors and re-render the form
             print(form.errors)
+            return render(request, 'home/register.html', {'form': form})
+
     else:
         form = RegistrationForm()
+        return render(request, 'home/register.html', {'form': form})
 
-    return render(request, 'home/register.html', {'form': form})
-       
+
+
+
 def Loginview(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -91,406 +87,320 @@ def Loginview(request):
 
         if user is not None:
             login(request, user)
-            return redirect('Home')  # Redirect to homepage or desired page after login
+
+            # Check if the profile is complete (example check, modify as per your fields)
+            try:
+                user_profile = UserProfile.objects.get(user=user)
+                if not user_profile.name or not user_profile.email:
+                    # Redirect to profile update page if required fields are missing
+                    return redirect('Profile')
+            except UserProfile.DoesNotExist:
+                # If profile doesn't exist, create a new one and redirect to profile update page
+                UserProfile.objects.create(user=user)
+                return redirect('Profile')
+
+            return redirect('Home')
         else:
-            messages.error(request, 'Invalid username or password')  
+            messages.error(request, 'Invalid username or password')
+    return render(request, 'home/login.html')
 
-    return render(request, 'home/login.html',)
 
+# def Logoutview(request):
+#     logout(request)
+#     return redirect('Home')
 def Logoutview(request):
-    logout(request)
-    # request.session.pop('has_submitted', None)  # Remove the session variable
+    logout(request)              # Logs the user out
+    # request.session.flush()      # Clears session data
     return redirect('Home')
-
 
 
 @login_required
 def profile(request):
-     user = request.user
-     if user.is_authenticated:
-        return render(request, 'home/profile.html', {'user': user})
-     else:
-        # Handle the case when the user is not authenticated
-        return render(request, 'home/profile.html')
+    profile = UserProfile.objects.get(user=request.user)
 
-   
-    
-# @login_required
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('Profile')  # Redirect to the same page after saving
+    else:
+        form = ProfileEditForm(instance=profile)
+
+    return render(request, 'home/profile.html', {
+        'form': form,
+        'profile': profile
+    })
+
+
+@login_required
 # def feedback_view(request):
-    
-#     obj2 = Batch.objects.all()
-#     obj1 = Batch.objects.values('Batchyear').distinct()
-    
-#     subjects = None
-#     labs = None
 #     if request.session.get('has_submitted', False):
-#         return render(request, 'home/Thankyou.html')  # Display a thank you page if already submitted
-#     if request.method == 'POST':
-#         selected_batch_year = request.POST.get('year')
-#         selected_department = request.POST.get('department')
-
-#         subjects = Subject_detail.objects.filter(
-#             Batch__Batchyear=selected_batch_year, 
-#             Batch__department=selected_department, 
-#             sub_type='SUBJECT'
-#         )
-#         labs = Subject_detail.objects.filter(
-#             Batch__Batchyear=selected_batch_year,
-#             Batch__department=selected_department,
-#             sub_type='LABORATORY'
-#         )
-
-#         response_submitted = False
-
-#         for key, value in request.POST.items():
-#             if key.startswith('response_'):  # Check if the key corresponds to a feedback response
-#                 response_submitted = True
-#                 qno = key.split('_')[1]  # Extract the question number from the key
-#                 response = value  # Get the selected response value
-#                 subject_id = request.POST.get(f'subject_{qno}')
-#                 subject = Subject_detail.objects.get(id=subject_id)
-
-                # Create and save a Feedback object
-                feedback = FeedbackRes(
-                    department=selected_department,
-                    Response=int(response),
-                    Qno=int(qno),
-                    subject_detail=subject,
-                    batch_year=selected_batch_year
-                )
-                feedback.save()
-        request.session['has_submitted'] = True
-
-#     form = OptionForm()
-
-#     return render(request, 'home/fformnew.html', {
-#         'Batches': obj1,
-#         'depart': obj2,
-#         'subjects': subjects, 
-#         'labs': labs, 
-#         'form': form
-#     })
-
-# new code for the after submission handling
-# @login_required
-# def feedback_view(request):
-   
-#     if FeedbackRes.objects.filter(user=request.user).exists():
-#         return render(request, 'home/Thankyou.html') 
+#         return render(request, 'home/Thankyou.html')
 
 #     obj2 = Batch.objects.all()
 #     obj1 = Batch.objects.values('Batchyear').distinct()
-    
+#     semesters = range(1, 9)
+
+#     selected_batch_year = request.POST.get('year')
+#     selected_department = request.POST.get('department')
+#     selected_semester = request.POST.get('semester')
+
 #     subjects = None
 #     labs = None
 
-#     if request.method == 'POST':
-#         selected_batch_year = request.POST.get('year')
-#         selected_department = request.POST.get('department')
-
+#     if request.method == 'POST' and selected_batch_year and selected_department and selected_semester:
 #         subjects = Subject_detail.objects.filter(
-#             Batch__Batchyear=selected_batch_year, 
-#             Batch__department=selected_department, 
-#             sub_type='SUBJECT'
-#         )
+#         Batch__Batchyear=selected_batch_year,
+#         Batch__department=selected_department,
+#         orensemester=selected_semester,
+#         sub_type='SUBJECT'
+#     )
 #         labs = Subject_detail.objects.filter(
-#             Batch__Batchyear=selected_batch_year,
-#             Batch__department=selected_department,
-#             sub_type='LABORATORY'
-#         )
+#         Batch__Batchyear=selected_batch_year,
+#         Batch__department=selected_department,
+#         orensemester=selected_semester,
+#         sub_type='LABORATORY'
+#     )
 
-#         response_submitted = False
+#     responses_saved = False
 
-#         for key, value in request.POST.items():
-#             if key.startswith('response_'):  # Check if the key corresponds to a feedback response
-#                 response_submitted = True
-#                 qno = key.split('_')[1]  # Extract the question number from the key
-#                 response = value  # Get the selected response value
-#                 subject_id = request.POST.get(f'subject_{qno}')
+#     for key in request.POST:
+#         if key.startswith('response_'):
+#             qno = key.split('_')[1]
+#             response = request.POST[key]
+#             subject_id = request.POST.get(f'subject_{qno}')
+
+#             try:
 #                 subject = Subject_detail.objects.get(id=subject_id)
-
-#                 # Create and save a Feedback object
-#                 feedback = FeedbackRes(
-#                     user=request.user,  # Save user with feedback to track submission
+#                 FeedbackRes.objects.create(
 #                     department=selected_department,
 #                     Response=int(response),
 #                     Qno=int(qno),
 #                     subject_detail=subject,
 #                     batch_year=selected_batch_year
 #                 )
-#                 feedback.save()
-                
-#         # Set a flag in the session to track feedback submission if not using the model
-#         request.session['has_submitted'] = True  
-        
-#         # Redirect to thank-you page after submission
+#                 responses_saved = True
+#             except Subject_detail.DoesNotExist:
+#                 print(f"Subject with ID {subject_id} not found")
+#             except Exception as e:
+#                 print(f"Error saving feedback: {e}")
+
+#     if responses_saved:
+#         request.session['has_submitted'] = True
 #         return render(request, 'home/Thankyou.html')
 
 #     form = OptionForm()
-
 #     return render(request, 'home/fformnew.html', {
 #         'Batches': obj1,
 #         'depart': obj2,
-#         'subjects': subjects, 
-#         'labs': labs, 
+#         'semesters': semesters,
+#         'subjects': subjects,
+#         'labs': labs,
 #         'form': form
 #     })
-    
-#newcode after debugging 
-# @login_required
-# def feedback_view(request):
-#     # Redirect to thank-you page if user has already submitted feedback
-#     if FeedbackRes.objects.filter(user=request.user).exists():
-#         return render(request, 'home/Thankyou.html') 
 
-#     obj2 = Batch.objects.all()
-#     obj1 = Batch.objects.values('Batchyear').distinct()
-    
-#     subjects = None
-#     labs = None
+#testing feedback view for the section
+@login_required
+def feedback_view(request):
+    if request.session.get('has_submitted', False):
+        return render(request, 'home/Thankyou.html')
 
-#     if request.method == 'POST':
-#         selected_batch_year = request.POST.get('year')
-#         selected_department = request.POST.get('department')
+    obj2 = Batch.objects.all()
+    obj1 = Batch.objects.values('Batchyear').distinct()
+    semesters = range(1, 9)
 
-#         subjects = Subject_detail.objects.filter(
-#             Batch__Batchyear=selected_batch_year, 
-#             Batch__department=selected_department, 
-#             sub_type='SUBJECT'
-#         )
-#         labs = Subject_detail.objects.filter(
-#             Batch__Batchyear=selected_batch_year,
-#             Batch__department=selected_department,
-#             sub_type='LABORATORY'
-#         )
+    selected_batch_year = request.POST.get('year', '').strip()
+    selected_department = request.POST.get('department', '').strip()
+    selected_semester = request.POST.get('semester', '').strip()
+    selected_section = request.POST.get('section', '')
 
-#         # Process feedback responses
-#         responses_saved = []
-#         for key, value in request.POST.items():
-#             if key.startswith('response_'):  # Check if the key corresponds to a feedback response
-#                 qno = key.split('_')[1]  # Extract the question number from the key
-#                 response = value  # Get the selected response value
-#                 subject_id = request.POST.get(f'subject_{qno}')
-#                 try:
-#                     subject = Subject_detail.objects.get(id=subject_id)
-                    
-#                     # Check if the user already submitted feedback for this subject and question
-#                     if FeedbackRes.objects.filter(
-#                         user=request.user, 
-#                         Qno=int(qno), 
-#                         subject_detail=subject
-#                     ).exists():
-#                         messages.error(request, f"Feedback for question {qno} already submitted.")
-#                         continue
+    print("Selected section:", selected_section)
+    sections = None
+    has_sections = False
+    subjects = None
+    labs = None
+    responses_saved = False
 
-#                     # Save the feedback
-#                     feedback = FeedbackRes.objects.create(
-#                         user=request.user,  # Save user with feedback to track submission
-#                         department=selected_department,
-#                         Response=int(response),
-#                         Qno=int(qno),
-#                         subject_detail=subject,
-#                         batch_year=selected_batch_year
-#                     )
-#                     responses_saved.append(feedback)
-#                 except Subject_detail.DoesNotExist:
-#                     messages.error(request, f"Subject with ID {subject_id} does not exist.")
-#                 except Exception as e:
-#                     messages.error(request, f"An error occurred: {str(e)}")
+    # Check if department has sections
+    if selected_batch_year and selected_department:
+        batch_qs = Batch.objects.filter(Batchyear=selected_batch_year, department=selected_department)
+        batch_ids = batch_qs.values_list('id', flat=True)
+        batch_section_qs = BatchSection.objects.filter(batch_id__in=batch_ids)
 
-#         # Check if any responses were saved successfully
-#         if responses_saved:
-#             request.session['has_submitted'] = True  
-#             return render(request, 'home/Thankyou.html', {"responses": responses_saved})
-#         else:
-#             messages.error(request, "No feedback responses were saved. Please try again.")
-    
-#     form = OptionForm()
+        if batch_section_qs.exists():
+            has_sections = True
+            sections = batch_section_qs.values_list('section_name', flat=True)
+            print("Sections available:", list(sections))  # Debug line to check sections
+        else:
+            has_sections = False
+            print("No sections found for the selected batch/department")
 
-#     return render(request, 'home/fformnew.html', {
-#         'Batches': obj1,
-#         'depart': obj2,
-#         'subjects': subjects, 
-#         'labs': labs, 
-#         'form': form
-#     })
- #coutning the response
+    # Show subjects and labs if everything is selected
+    if selected_batch_year and selected_department and selected_semester:
+        if not has_sections or (has_sections and selected_section):
+            subjects = Subject_detail.objects.filter(
+                Batch__Batchyear=selected_batch_year,
+                Batch__department=selected_department,
+                orensemester=selected_semester,
+                sub_type='SUBJECT'
+            )
+            labs = Subject_detail.objects.filter(
+                Batch__Batchyear=selected_batch_year,
+                Batch__department=selected_department,
+                orensemester=selected_semester,
+                sub_type='LABORATORY'
+            )
+
+    print("Selected section2:", selected_section)
+    # Save responses
+    for key in request.POST:
+        if key.startswith('response_'):
+            qno = key.split('_')[1]
+            response = request.POST[key]
+            subject_id = request.POST.get(f'subject_{qno}')
+
+            try:
+                subject = Subject_detail.objects.get(id=subject_id)
+
+                section_obj = None
+                if selected_section:
+                    section_obj = BatchSection.objects.filter(
+                        batch__Batchyear=selected_batch_year,
+                        batch__department=selected_department,
+                        section_name=selected_section
+                    ).first()
+
+                    # Debugging the section fetching
+                    if section_obj:
+                        print(f"Found section: {section_obj.section_name}")
+                    else:
+                        print(f"No matching section found for {selected_batch_year}, {selected_department}, {selected_section}")
+
+                # Save the feedback response
+                feedback = FeedbackRes.objects.create(
+                    department=selected_department,
+                    Response=int(response),
+                    Qno=int(qno),
+                    subject_detail=subject,
+                    batch_year=selected_batch_year,
+                    section=selected_section,
+                    user=request.user if request.user.is_authenticated else None
+                )
+                print("Saved feedback entry:", feedback, " | Section saved:", feedback.section)
+
+                responses_saved = True
+
+            except Subject_detail.DoesNotExist:
+                print(f"Subject with ID {subject_id} not found")
+            except Exception as e:
+                print(f"Error saving feedback: {e}")
+    # Before rendering the response
+    print("Request POST data:", request.POST)
+    selected_section = request.POST.get('section', '').strip()
+    print("Selected section after POST:", selected_section)
+
+    if responses_saved:
+        request.session['has_submitted'] = True
+        return render(request, 'home/Thankyou.html')
+
+    form = OptionForm()
+    return render(request, 'home/fformnew.html', {
+        'Batches': obj1,
+        'depart': obj2,
+        'semesters': semesters,
+        'subjects': subjects,
+        'labs': labs,
+        'form': form,
+        'sections': sections,
+        'selected_year': selected_batch_year,
+        'selected_department': selected_department,
+        'selected_semester': selected_semester,
+        'selected_section': selected_section,
+    })
 
 
 def calculate_feedback_score():
-    # Count responses
     average_count = FeedbackRes.objects.filter(Response=2).count()
     good_count = FeedbackRes.objects.filter(Response=3).count()
     very_good_count = FeedbackRes.objects.filter(Response=4).count()
     excellent_count = FeedbackRes.objects.filter(Response=5).count()
 
-    # Calculate the weighted average using the given formula
-    if (average_count + good_count + very_good_count + excellent_count) == 0:
-        return 0  # Avoid division by zero
+    total = average_count + good_count + very_good_count + excellent_count
+    if total == 0:
+        return 0
 
-    score = round((((average_count*2) + (good_count*3) + (very_good_count*4) + (excellent_count*5)) / 
-                ((average_count + good_count + very_good_count + excellent_count)*5)) * 5, 2)
-
+    score = round((((average_count * 2) + (good_count * 3) +
+                   (very_good_count * 4) + (excellent_count * 5)) /
+                  (total * 5)) * 5, 2)
     return score
+
+
 @login_required
 def feedback_score_view(request):
     score = calculate_feedback_score()
     return render(request, 'home/score.html', {'score': score})
 
 
-# report generating
 @login_required
 def feedback_report_view(request):
-    obj2 = Batch.objects.all()
-    obj1 = Batch.objects.values('Batchyear').distinct()
-    
-  
-    selected_batch = request.POST.get('batch_year', None)
-    selected_department = request.POST.get('department', None)
+    batches = Batch.objects.all()
+    departments = Batch.objects.values_list('department', flat=True).distinct()
+    semesters = [1, 2, 3, 4, 5, 6, 7, 8]
+    sections = BatchSection.objects.values_list('section_name', flat=True).distinct()
 
-    feedback_query = FeedbackRes.objects.all()
-
-    if selected_batch:
-        feedback_query = feedback_query.filter(batch_year=selected_batch)
-    
-    if selected_department:
-        feedback_query = feedback_query.filter(department=selected_department)
-        
-
-    subject_feedback = feedback_query.values('subject_detail__sub_name','subject_detail__sub_code',).annotate(
-        average_count=Count('Response', filter=models.Q(Response=2)),
-        good_count=Count('Response', filter=models.Q(Response=3)),
-        very_good_count=Count('Response', filter=models.Q(Response=4)),
-        excellent_count=Count('Response', filter=models.Q(Response=5)),
-        average_score=Avg('Response'),
-       
-    )
-    #code for faculty name...
-    # For each subject, find the related staff using the ManyToMany relationship
-    # for feedback in subject_feedback:
-    #     subject = Subject_detail.objects.get(sub_code=feedback['subject_detail__sub_code'])
-    #     feedback['staff_names'] = ', '.join([staff.name for staff in subject.staff_handling.all()])
-    for feedback in subject_feedback:
-        subject = Subject_detail.objects.filter(sub_code=feedback['subject_detail__sub_code']).first()
-        if subject:
-            feedback['staff_names'] = ', '.join([staff.name for staff in subject.staff_handling.all()])
-        else:
-            feedback['staff_names'] = 'N/A'
-
-    context = {
-        'subject_feedback': subject_feedback,
-        'Batches': obj1,
-        'depart': obj2,
-        'selected_batch': selected_batch,
-        'selected_department': selected_department,
-        
-    }
-    
-    return render(request, 'home/report.html', context)
-
-
-
-   
-def submit(request):
-    return render(request,'home/test.html')
-
-# testing with semester 
-@login_required
-def feedback_view(request):
-
-    # Redirect to thank-you page if user has already submitted feedback
-    if FeedbackRes.objects.filter(user=request.user).exists():
-        return render(request, 'home/Thankyou.html')
-
-    obj2 = Batch.objects.all()
-    obj1 = Batch.objects.values('Batchyear').distinct()
-    semesters = range(1, 9)  # Assuming semesters 1-8
-    
-
-    # Initialize default values
-    selected_batch_year = None
-    selected_department = None
-    selected_semester = None
-
-    subjects = None
-    labs = None
+    selected_batch = selected_department = selected_semester = selected_section = None
+    subject_feedback = []
 
     if request.method == 'POST':
-        selected_batch_year = request.POST.get('year')
+        selected_batch = request.POST.get('batch_year')
         selected_department = request.POST.get('department')
-        selected_semester = request.POST.get('semester')  # Get selected semester
-        print(selected_semester)
+        selected_semester = request.POST.get('semester')
+        selected_section = request.POST.get('section')
+        print("Selected batch:", selected_batch)
+        print("Selected department:", selected_department)
+        print("Selected semester:", selected_semester)
+        print("Selected section:", selected_section)
+        
 
-        # Filter subjects and labs by batch, department, and semester
-        subjects = Subject_detail.objects.filter(
-            Batch__Batchyear=selected_batch_year, 
-            Batch__department=selected_department,
-            orensemester=selected_semester,  # Add semester filter
-            sub_type='SUBJECT'
+        if selected_batch and selected_department and selected_semester and selected_section:
+            feedback_qs = FeedbackRes.objects.filter(
+            batch_year=selected_batch,
+            department=selected_department,
+            section=selected_section,
+            subject_detail__orensemester=selected_semester
         )
-        labs = Subject_detail.objects.filter(
-            Batch__Batchyear=selected_batch_year,
-            Batch__department=selected_department,
-            orensemester=selected_semester,  # Add semester filter
-            sub_type='LABORATORY'
-        )
-
-        # Process feedback responses
-        responses_saved = []
-        for key, value in request.POST.items():
-            if key.startswith('response_'):  # Check if the key corresponds to a feedback response
-                qno = key.split('_')[1]  # Extract the question number from the key
-                response = value  # Get the selected response value
-                subject_id = request.POST.get(f'subject_{qno}')
-                try:
-                    subject = Subject_detail.objects.get(id=subject_id)
-                    
-                    # Check if the user already submitted feedback for this subject and question
-                    if FeedbackRes.objects.filter(
-                        user=request.user, 
-                        Qno=int(qno), 
-                        subject_detail=subject
-                    ).exists():
-                        messages.error(request, f"Feedback for question {qno} already submitted.")
-                        continue
-
-                    # Save the feedback
-                    feedback = FeedbackRes.objects.create(
-                        user=request.user,  # Save user with feedback to track submission
-                        department=selected_department,
-                        Response=int(response),
-                        Qno=int(qno),
-                        subject_detail=subject,
-                        batch_year=selected_batch_year
-                    )
-                    responses_saved.append(feedback)
-                except Subject_detail.DoesNotExist:
-                    messages.error(request, f"Subject with ID {subject_id} does not exist.")
-                except Exception as e:
-                    messages.error(request, f"An error occurred: {str(e)}")
-
-        # Check if any responses were saved successfully
-        if responses_saved:
-            request.session['has_submitted'] = True
-            return render(request, 'home/Thankyou.html', {"responses": responses_saved})
+            print("Number of feedback results:", feedback_qs.count())
+            subject_feedback = (
+                feedback_qs
+                .values('subject_detail__sub_code', 'subject_detail__sub_name')
+                .annotate(
+                    average_score=Avg('Response'),
+                    average_count=Count('id', filter=Q(Response__lte=2)),
+                    good_count=Count('id', filter=Q(Response__gt=2, Response__lte=3)),
+                    very_good_count=Count('id', filter=Q(Response__gt=3, Response__lte=4)),
+                    excellent_count=Count('id', filter=Q(Response__gt=4)),
+                    staff_names=F('subject_detail__staff_handling__name')
+                )
+                .order_by('subject_detail__sub_code')
+            )
         else:
-            messages.error(request, "No feedback responses were saved. Please try again.")
-
-    form = OptionForm()
-
-    # Get all available departments for the selected batch year if provided
-    departments = (
-        Subject_detail.objects.filter(Batch__Batchyear=selected_batch_year)
-        .values('department')
-        .distinct() if selected_batch_year else None
-    )
-
-    return render(request, 'home/fformnew.html', {
-        'Batches': obj1,
-        'depart': obj2,
-        'semesters': semesters,  # Pass the semesters to the template
-        'subjects': subjects, 
-        'labs': labs, 
-        'form': form,
-        'departments': departments,  # Pass departments based on batch year
+            subject_feedback = []
+    
+    total_response_count = FeedbackRes.objects.values('user').distinct().count() 
+    return render(request, 'home/report.html', {
+        'Batches': batches,
+        'depart': departments,
+        'semesters': semesters,
+        'sections': sections,
+        'selected_batch': selected_batch,
+        'selected_department': selected_department,
+        'selected_semester': selected_semester,
+        'selected_section': selected_section,
+        'subject_feedback': subject_feedback,
+        'total_response_count': total_response_count
     })
+
+
+
+def submit(request):
+    return render(request, 'home/test.html')

@@ -21,22 +21,29 @@ class User(AbstractUser):
 
 
 
+class Batch(models.Model):
+    Batchyear=models.CharField(max_length=50,null=False,blank=False)
+    department=models.CharField(max_length=50,null=False,blank=False)
+    
+    def __str__(self):
+        return f"{self.Batchyear} -- {self.department}"
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name=models.CharField(max_length=50,null=False,blank=False)
     email = models.EmailField(unique=True, max_length=191, null=False, blank=False)
     password = models.CharField(max_length=50)
     designation = models.CharField(max_length=50, choices=DESIGNATION_CHOICES, default='STUDENT',null=False,blank=False)
+    batch = models.ForeignKey(Batch, on_delete=models.SET_NULL, null=True, blank=True)
 
 
     def __str__(self):
         return self.name + self.designation
 
-class Batch(models.Model):
-    Batchyear=models.CharField(max_length=50,null=False,blank=False)
-    department=models.CharField(max_length=50,null=False,blank=False)
+class BatchSection(models.Model):
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="sections")
+    section_name = models.CharField(max_length=10)
     def __str__(self):
-        return f" {self.Batchyear}--{self.department}"
+        return f"{self.batch.Batchyear} - {self.batch.department} - {self.section_name}"
 
 SUBJECT_CHOICES=[ ('SUBJECT', 'Subject'),
             ('LABORATORY', 'Laboratory'),]
@@ -70,4 +77,12 @@ class FeedbackRes(models.Model):
     Qno=models.IntegerField(null=True)
     subject_detail = models.ForeignKey('Subject_detail', on_delete=models.CASCADE, null=True)
     batch_year = models.CharField(max_length=10,null=False)
+    section = models.CharField(max_length=10, null=True, blank=True)
     
+
+class Faculty(models.Model):
+    faculty_code = models.CharField(max_length=10, unique=True)  # Unique faculty code
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name

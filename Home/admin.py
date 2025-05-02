@@ -2,21 +2,26 @@
 from django.contrib import admin
 from .models import *
 
-# Register your models here.
 
-# class AnswerInline(admin.TabularInline):
-#     model=FeedbackAnswer
-# class QuestionAdmin(admin.ModelAdmin):
-#     inlines=[AnswerInline]
 
 class StudentInline(admin.TabularInline):
     model = Subject_detail
     extra = 5  # Set the number of empty forms to display
 
-# class BatchAdmin(admin.ModelAdmin):
-#     inlines = [StudentInline]
+class BatchSectionInline(admin.TabularInline):
+    model = BatchSection
+    extra = 1  # Number of empty sections to display in the admin panel
 
-admin.site.register(Batch)
+class BatchAdmin(admin.ModelAdmin):
+    list_display = ('Batchyear', 'department')
+    inlines = [BatchSectionInline]
+
+admin.site.register(Batch, BatchAdmin)
+admin.site.register(BatchSection)
+
+admin.site.register(Faculty)
+  # Add the SectionInline
+
 
 
 
